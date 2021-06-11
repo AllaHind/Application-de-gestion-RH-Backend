@@ -1,7 +1,11 @@
 package com.bezkoder.springjwt.payload.request;
 
+import com.bezkoder.springjwt.bean.Equipe;
+
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.*;
  
 public class SignupRequest {
@@ -13,12 +17,39 @@ public class SignupRequest {
     @Size(max = 50)
     @Email
     private String email;
-    
-    private Set<String> role;
-    
+
+    public List<String> getRole() {
+        return role;
+    }
+
+    public void setRole(List<String> role) {
+        this.role = role;
+    }
+
+    private List<String> role;
+
     @NotBlank
     @Size(min = 6, max = 40)
     private String password;
+
+    public String getPassword2() {
+        return password2;
+    }
+
+    public void setPassword2(String password2) {
+        this.password2 = password2;
+    }
+
+    private String password2;
+private String phoneNumber;
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     private String fullname;
     private String matricule;
@@ -26,13 +57,24 @@ public class SignupRequest {
     private String anciennete;
     private String dateEmbauche;
     private String responsable;
-    private String emploi;
     private String uniteOrgani;
-    private int indice;
+    private int indice=30;
     private String echelle;
     private String echelon;
     private String datechelle;
     private String datechelon;
+    private String emmploi;
+
+    public String getEmmploi() {
+        return emmploi;
+    }
+
+    public void setEmmploi(String emmploi) {
+        this.emmploi = emmploi;
+    }
+
+    @ManyToOne
+    private Equipe equipe;
 
     public String getMatricule() {
         return matricule;
@@ -74,13 +116,7 @@ public class SignupRequest {
         this.responsable = responsable;
     }
 
-    public String getEmploi() {
-        return emploi;
-    }
 
-    public void setEmploi(String emploi) {
-        this.emploi = emploi;
-    }
 
     public String getUniteOrgani() {
         return uniteOrgani;
@@ -161,12 +197,13 @@ public class SignupRequest {
     public void setPassword(String password) {
         this.password = password;
     }
-    
-    public Set<String> getRole() {
-      return this.role;
+
+
+    public Equipe getEquipe() {
+        return equipe;
     }
-    
-    public void setRole(Set<String> role) {
-      this.role = role;
+
+    public void setEquipe(Equipe equipe) {
+        this.equipe = equipe;
     }
 }

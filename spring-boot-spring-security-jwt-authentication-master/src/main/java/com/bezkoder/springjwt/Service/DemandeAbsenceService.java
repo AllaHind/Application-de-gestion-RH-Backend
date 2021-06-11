@@ -5,6 +5,7 @@ import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.repository.Absencedao;
 import com.bezkoder.springjwt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +17,16 @@ public class DemandeAbsenceService {
 private UserRepository userRepository;
     @Autowired
     private Absencedao absenceDao;
+    @Query("SELECT SUM(nombrejours) FROM DemandeAbsence d where d.user.id=:id and d.type='Congé'  and d.status='acceptée' ")
+    public int sommeSolde(Long id) {
+
+        return absenceDao.sommeSolde(id);
+    }
+
     @Autowired
     private EmployeService employeService;
 
-    @Transactional
-    public int deleteByRef(String ref) {
-        return absenceDao.deleteByRef(ref);
-    }
+
 
     /*
     public List<DemandeAbsence> findByEmployeMatricule(String matricule) {
@@ -37,7 +41,7 @@ private UserRepository userRepository;
 	User user = userRepository.findByEmail(absence.getUser().getEmail());
 	absence.setUser( user);
 
-	if (user == null) {
+	if (user == null || user.getId()==null) {
 		return -2;
 	}
 
@@ -54,9 +58,9 @@ private UserRepository userRepository;
 	}
 	 else */
         if (absence.getNombrejours() == 0) {
-            return -1;
-        } else if (absence.getFirstDay().compareTo(absence.getLastDay()) > 0 || absence.getLastDay().compareTo(absence.getReprise()) > 0 || absence.getFirstDay().compareTo(absence.getReprise()) > 0) {
             return -2;
+        } else if (absence.getFirstDay().compareTo(absence.getLastDay()) > 0 || absence.getLastDay().compareTo(absence.getReprise()) > 0 || absence.getFirstDay().compareTo(absence.getReprise()) > 0) {
+            return -3;
         }
         absenceDao.save(absence);
         return 1;
@@ -89,7 +93,7 @@ public int soldeRestant() {
         absenceDao.save(demandeAbsence);
         return 1;
     }
-    public int save(User user, List<DemandeAbsence> demandeAbsences) {
+   /* public int save(User user, List<DemandeAbsence> demandeAbsences) {
         // TODO Auto-generated method stub
 
         for(DemandeAbsence d:demandeAbsences)
@@ -100,9 +104,29 @@ public int soldeRestant() {
         return 1;
     }
 
+*/
+
+    @Query("SELECT count(*) FROM DemandeAbsence d where d.user.id=:id  and d.status='En cours de traitement' ")
+    public int DemandeEncours(Long id) {
+        return absenceDao.DemandeEncours(id);
+    }
+
+    @Query("SELECT count(*) FROM DemandeAbsence d where d.user.id=:id  and d.status='Approuvée' ")
+    public int DemandeApprouve(Long id) {
+        return absenceDao.DemandeApprouve(id);
+    }
+
+    @Query("SELECT count(*) FROM DemandeAbsence d where d.user.id=:id  and d.status='Rejetée' ")
+    public int DemandeRejetee(Long id) {
+        return absenceDao.DemandeRejetee(id);
+    }
+
+    public List<DemandeAbsence> findByUserId(Long id) {
+        return absenceDao.findByUserId(id);
+    }
 
 
-}
+
 
 
 /*void AbsenceRest(DemandeAbsence demandeAbsence)
@@ -116,12 +140,12 @@ public int soldeRestant() {
 public int SommeAbsence() {
 	return absenceDao.SommeAbsence();
 }*/
-/*
-public int save(Employe employe, List<DemandeAbsence> absences) {
+
+public int save(User user, List<DemandeAbsence> absences) {
 	// TODO Auto-generated method stub
 	for(DemandeAbsence d:absences)
 	{
-		d.setEmploye(employe);
+		d.setUser(user);
 		absenceDao.save(d);
 
 	}
@@ -134,4 +158,4 @@ public int save(Employe employe, List<DemandeAbsence> absences) {
 
     }
 
-*/
+

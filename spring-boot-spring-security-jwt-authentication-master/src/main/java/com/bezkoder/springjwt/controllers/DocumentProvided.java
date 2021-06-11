@@ -37,5 +37,9 @@ public class DocumentProvided {
         return documentService.exportTermePdf();
     }
 
+    @GetMapping("/id/{id}")
+    public List<Document> findByUserId(@PathVariable Long id) {
+        return documentService.findByUserId(id);
+    }
 }
 

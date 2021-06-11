@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.bezkoder.springjwt.bean.Employe;
+import com.bezkoder.springjwt.bean.Equipe;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.bezkoder.springjwt.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 public class UserDetailsImpl implements UserDetails {
@@ -46,10 +48,19 @@ public class UserDetailsImpl implements UserDetails {
 	private String datechelle;
 	private String datechelon;
 
+	@ManyToOne
+	Equipe equipe;
 
+	public Equipe getEquipe() {
+		return equipe;
+	}
+
+	public void setEquipe(Equipe equipe) {
+		this.equipe = equipe;
+	}
 
 	public UserDetailsImpl(Long id, String username, String email, String password, String fullname,
-						   Collection<? extends GrantedAuthority> authorities,String matricule,String date_naissance,String anciennete,String dateEmbauche,String responsable,String emploi,String uniteOrgani,int indice,String echelle,String echelon,String datechelle,String datechelon) {
+						   Collection<? extends GrantedAuthority> authorities, String matricule, String date_naissance, String anciennete, String dateEmbauche, String responsable, String uniteOrgani, int indice, String echelle, String echelon, String datechelle, String datechelon, Equipe equipe) {
 		this.id = id;
 		this.username = username;
 		this.email = email;
@@ -61,13 +72,13 @@ public class UserDetailsImpl implements UserDetails {
 		this.anciennete=anciennete;
 		this.dateEmbauche=dateEmbauche;
 		this.responsable=responsable;
-		this.emploi=emploi;
 		this.uniteOrgani=uniteOrgani;
 		this.indice=indice;
 		this.echelle=echelle;
 		this.echelon=echelon;
 		this.datechelle=datechelle;
 		this.datechelon=datechelon;
+		this.setEquipe(equipe);
 
 	}
 
@@ -82,7 +93,8 @@ public class UserDetailsImpl implements UserDetails {
 				user.getEmail(),
 				user.getPassword(),
 				user.getFullname(),
-				authorities,user.getMatricule(),user.getDate_naissance(),user.getAnciennete(),user.getDateEmbauche(),user.getResponsable(),user.getEmploi(),user.getUniteOrgani(),user.getIndice(),user.getEchelle(),user.getEchelon(),user.getDatechelle(),user.getDatechelon());
+				authorities,user.getMatricule(),user.getDate_naissance(),user.getAnciennete(),user.getDateEmbauche(),user.getResponsable(),user.getUniteOrgani(),user.getIndice(),user.getEchelle(),user.getEchelon(),user.getDatechelle(),user.getDatechelon(),user
+		.getEquipe());
 
 
 

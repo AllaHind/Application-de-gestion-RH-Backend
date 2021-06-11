@@ -1,29 +1,26 @@
 package com.bezkoder.springjwt.controllers;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import com.bezkoder.springjwt.Service.DemandeAbsenceService;
 import com.bezkoder.springjwt.Service.EmployeService;
+import com.bezkoder.springjwt.Service.EquipeService;
+import com.bezkoder.springjwt.bean.DemandeAbsence;
 import com.bezkoder.springjwt.bean.Employe;
+import com.bezkoder.springjwt.bean.Equipe;
 import com.bezkoder.springjwt.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.bezkoder.springjwt.models.ERole;
 import com.bezkoder.springjwt.models.Role;
@@ -46,6 +43,9 @@ public class AuthController {
 	@Autowired
 	AuthenticationManager authenticationManager;
 
+@Autowired
+AuthController authController;
+
 	@Autowired
 	UserRepository userRepository;
 
@@ -54,7 +54,8 @@ public class AuthController {
 
 	@Autowired
 	PasswordEncoder encoder;
-
+@Autowired
+	EquipeService equipeService;
 	@Autowired
 	JwtUtils jwtUtils;
 
@@ -84,27 +85,37 @@ public class AuthController {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Username is already taken!"));
+					.body(new MessageResponse("Error: Username déjà existant!"));
 		}
 
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Email is already in use!"));
+					.body(new MessageResponse("Error: Email déjà existant!"));
+		}
+		if (signUpRequest.getPassword().compareTo(signUpRequest.getPassword2())!=0) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: Les mots de passe ne correspondent pas! "));
+		}
+		if (userRepository.existsByMatricule(signUpRequest.getMatricule())) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: Matricule déjà existants! "));
 		}
 
 		// Create new user's account
-		User user = new User(signUpRequest.getUsername(), 
+		User user = new User(signUpRequest.getUsername(),
 							 signUpRequest.getEmail(),
-							 encoder.encode(signUpRequest.getPassword()),signUpRequest.getFullname(),signUpRequest.getMatricule(),signUpRequest.getDate_naissance(),signUpRequest.getAnciennete(),signUpRequest.getDateEmbauche(),signUpRequest.getResponsable(),signUpRequest.getResponsable(),signUpRequest.getEmploi(),signUpRequest.getIndice(),signUpRequest.getEchelle(),signUpRequest.getEchelon(),signUpRequest.getDatechelle(),signUpRequest.getDatechelon()
+							 encoder.encode(signUpRequest.getPassword()),encoder.encode(signUpRequest.getPassword2()),signUpRequest.getFullname(),signUpRequest.getMatricule(),signUpRequest.getDate_naissance(),signUpRequest.getAnciennete(),signUpRequest.getDateEmbauche(),signUpRequest.getResponsable(),signUpRequest.getResponsable(),signUpRequest.getIndice(),signUpRequest.getEchelle(),signUpRequest.getEchelon(),signUpRequest.getDatechelle(),signUpRequest.getDatechelon(),signUpRequest.getEquipe(),signUpRequest.getEmmploi()
 
 
 
 
 		);
 
-		Set<String> strRoles = signUpRequest.getRole();
-		Set<Role> roles = new HashSet<>();
+		List<String> strRoles =signUpRequest.getRole();
+		List<Role> roles = new ArrayList<>();
 
 		if (strRoles == null) {
 			Role userRole = roleRepository.findByName(ERole.ROLE_USER)
@@ -133,20 +144,28 @@ public class AuthController {
 			});
 		}
 
-		user.setRoles(roles);
+		user.setRoles((List<Role>) roles);
 		//Optional<User> user =userRepository.findByUsername(employe.getUser().getUsername());
 	//	employe.setUser(user);
 
 		/*Employe employe=employeService.findByMatricule(user.getEmploye().getMatricule());
 		user.setEmploye(employe);*/
+		/*Equipe equipe= equipeService.findByName(user.getEquipe().getName());
+		user.setEquipe(equipe);
+		if(equipe==null)
+		{
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Equipe n'existe pas!"));
+		}*/
 		userRepository.save(user);
-		demandeAbsenceService.save(user,user.getDemandeAbsences());
+		//demandeAbsenceService.save(user,user.getDemandeAbsences());
 
 
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
-	/*
-	public int save(Employe employe, User user) {
+
+/*	public int save(Employe employe, User user) {
 		// TODO Auto-generated method stub
 
 
@@ -155,6 +174,35 @@ public class AuthController {
 		return 1;
 	}
 	*/
+@GetMapping("/id/{id}")
+	public Optional<User> findById(@PathVariable Long id) {
+		return userRepository.findById(id);
+	}
+
+	@GetMapping("/findall")
+	public List<User> findAll() {
+		return userRepository.findAll();
+	}
+@DeleteMapping("/id/{id}")
+	public void deleteById(@PathVariable Long id) {
+		userRepository.deleteById(id);
+	}
+
+	@GetMapping("/find/{id}")
+	@Query("Select u from User u where u.id<>:id")
+	List<User> find(@PathVariable Long id){
+		return  userRepository.find(id);
+	}
+
+@PutMapping("/")
+public int update(@RequestBody SignupRequest signupRequest) {
+
+	return authController.update1(signupRequest);
+}
+	public int update1(SignupRequest signupRequest) {
+		authController.registerUser(signupRequest);
+		return 1;
+	}
 
 
 }

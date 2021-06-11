@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import com.bezkoder.springjwt.models.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Optional;
 
@@ -15,7 +16,6 @@ import java.util.Optional;
 public class DemandeAbsence {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-
     private Long  id;
     private String type;
     private String ref;
@@ -27,7 +27,7 @@ public class DemandeAbsence {
     private String typeConge;
     private String motif;
     private String reprise;
-
+  //  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     private User user;
 

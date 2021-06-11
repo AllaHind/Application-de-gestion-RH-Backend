@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.security.services;
 
+import com.bezkoder.springjwt.bean.Equipe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.repository.UserRepository;
+
+import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -23,5 +26,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 		return UserDetailsImpl.build(user);
 	}
+
+	public int save(Equipe equipe, List<User> users) {
+		for(User u:users)
+		{
+			u.setEquipe(equipe);
+			userRepository.save(u);
+		}
+		return  1;
+	}
+
 
 }

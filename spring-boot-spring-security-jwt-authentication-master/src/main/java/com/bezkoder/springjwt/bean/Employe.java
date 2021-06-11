@@ -23,7 +23,8 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
 
-        private Long  id;private String nomComplet;
+        private Long  id;
+        private String nomComplet;
         private String matricule;
 
         private String date_naissance;

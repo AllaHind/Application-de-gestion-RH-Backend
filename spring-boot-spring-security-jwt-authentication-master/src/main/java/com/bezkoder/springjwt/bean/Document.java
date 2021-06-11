@@ -7,7 +7,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import com.bezkoder.springjwt.models.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.ManyToAny;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class Document {
@@ -16,10 +20,20 @@ public class Document {
 
     private Long id;
     private String libelle;
-    private String  dateDemande;
+    private LocalDateTime  dateDemande;
     private String status="En cours";
+   // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
-    private Employe employe;
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public Long getId() {
         return id;
     }
@@ -33,10 +47,10 @@ public class Document {
     public void setLibelle(String libelle) {
         this.libelle = libelle;
     }
-    public String getDateDemande() {
+    public LocalDateTime getDateDemande() {
         return dateDemande;
     }
-    public void setDateDemande(String dateDemande) {
+    public void setDateDemande(LocalDateTime dateDemande) {
         this.dateDemande = dateDemande;
     }
     public String getStatus() {
@@ -45,12 +59,8 @@ public class Document {
     public void setStatus(String status) {
         this.status = status;
     }
-    public Employe getEmploye() {
-        return employe;
-    }
-    public void setEmploye(Employe employe) {
-        this.employe = employe;
-    }
+
+
 
 
 }

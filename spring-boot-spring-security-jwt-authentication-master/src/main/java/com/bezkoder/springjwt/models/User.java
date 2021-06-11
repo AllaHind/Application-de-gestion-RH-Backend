@@ -1,8 +1,9 @@
 package com.bezkoder.springjwt.models;
 
-import com.bezkoder.springjwt.bean.DemandeAbsence;
-import com.bezkoder.springjwt.bean.Employe;
+import com.bezkoder.springjwt.bean.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,50 +37,134 @@ public class User {
 	@Size(max = 120)
 	private String password;
 
+	public String getPassword2() {
+		return password2;
+	}
+
+	public void setPassword2(String password2) {
+		this.password2 = password2;
+	}
+
+	private String password2;
+
 	private String fullname;
+
+	private String phoneNumber;
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(	name = "user_roles", 
 				joinColumns = @JoinColumn(name = "user_id"), 
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<Role> roles = new HashSet<>();
+	private List<Role> roles = new ArrayList<>();
+
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
+private boolean chefService;
 	private String matricule;
 	private String date_naissance;
 	private String anciennete;
 	private String dateEmbauche;
 	private String responsable;
-	private String emploi;
 	private String uniteOrgani;
-	private int indice;
+	private int indice=30;
 	private String echelle;
 	private String echelon;
 	private String datechelle;
 	private String datechelon;
+	private String emmploi;
 
+	public String getEmmploi() {
+		return emmploi;
+	}
+
+	public void setEmmploi(String emmploi) {
+		this.emmploi = emmploi;
+	}
+
+	/*private  int solde=30;
+
+        public int getSolde() {
+            return solde;
+        }
+
+        public void setSolde(int solde) {
+            this.solde = solde;
+        }*/
+	@ManyToOne
+	private Equipe equipe;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(mappedBy = "user")
 	private List<DemandeAbsence> demandeAbsences;
 
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@OneToMany(mappedBy = "user")
+	private List<Document> documents;
+
+
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@OneToMany(mappedBy = "user")
+	private List<FileDB> fileDBList;
+
+	public List<FileDB> getFileDBList() {
+		return fileDBList;
+	}
+
+	public void setFileDBList(List<FileDB> fileDBList) {
+		this.fileDBList = fileDBList;
+	}
+
+	public Equipe getEquipe() {
+		return equipe;
+	}
+
+	public void setEquipe(Equipe equipe) {
+		this.equipe = equipe;
+	}
+
+	public List<Document> getDocuments() {
+		return documents;
+	}
+
+	public void setDocuments(List<Document> documents) {
+		this.documents = documents;
+	}
 
 	public User() {
 	}
 
-	public User(String username, String email, String password,String fullname,String matricule,String date_naissance,String anciennete,String dateEmbauche,String responsable,String emploi,String uniteOrgani,int indice,String echelle,String echelon,String datechelle,String datechelon) {
+	public User(String username, String email, String password,String password2,String fullname,String matricule,String date_naissance,String anciennete,String dateEmbauche,String responsable,String uniteOrgani,int indice,String echelle,String echelon,String datechelle,String datechelon,Equipe equipe,String emmploi) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+		this.password2 = password2;
 		this.fullname=fullname;
 		this.matricule=matricule;
 		this.date_naissance=date_naissance;
 		this.anciennete=anciennete;
 		this.dateEmbauche=dateEmbauche;
 		this.responsable=responsable;
-		this.emploi=emploi;
 		this.uniteOrgani=uniteOrgani;
 		this.indice=indice;
 		this.echelle=echelle;
 		this.echelon=echelon;
 		this.datechelle=datechelle;
 		this.datechelon=datechelon;
+		this.setEquipe(equipe);
+		this.emmploi=emmploi;
+
 	}
 	public String getMatricule() {
 		return matricule;
@@ -119,14 +204,6 @@ public class User {
 
 	public void setResponsable(String responsable) {
 		this.responsable = responsable;
-	}
-
-	public String getEmploi() {
-		return emploi;
-	}
-
-	public void setEmploi(String emploi) {
-		this.emploi = emploi;
 	}
 
 	public String getUniteOrgani() {
@@ -209,13 +286,7 @@ public class User {
 		this.password = password;
 	}
 
-	public Set<Role> getRoles() {
-		return roles;
-	}
 
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
 	public String getFullname() {
 		return fullname;
 	}
@@ -231,6 +302,5 @@ public class User {
 	public void setDemandeAbsences(List<DemandeAbsence> demandeAbsences) {
 		this.demandeAbsences = demandeAbsences;
 	}
-
 
 }
